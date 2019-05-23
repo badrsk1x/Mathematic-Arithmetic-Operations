@@ -1,4 +1,6 @@
 .DS_Store
 .idea/
+vendor/
+.phpunit.result.cache
 log.txt
 result.csv

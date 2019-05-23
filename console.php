@@ -1,46 +1,41 @@
 <?php
+require __DIR__ . '/vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv->load();
 
-$shortopts = "a:f:";
-$longopts  = array(
-    "action:",
-    "file:",
-);
+use App\MathOperations;
+
+$shortopts  = getenv('SHORT_OPTS');
+$longopts   = [ getenv('LONG_OPTS_1').":", getenv('LONG_OPTS_2').":"];
+$action     = getenv('DEFAULT_ACTION');
+$file       = getenv('DEFAULT_FILE');
 
 $options = getopt($shortopts, $longopts);
 
-if(isset($options['a'])) {
-    $action = $options['a'];
-} elseif(isset($options['action'])) {
-    $action = $options['action'];
-} else {
-    $action = "xyz";
-}
-
-if(isset($options['f'])) {
-    $file = $options['f'];
-} elseif(isset($options['file'])) {
-    $file = $options['file'];
-} else {
-    $file = "notexists.csv";
+foreach($options as $key=>$optionVal){
+    switch ($key){
+        case 'a' :  
+        case 'action' :   $action = $optionVal; break;
+        case 'f'      : 
+        case 'file'   :   $file = $optionVal; break;
+        default       : break;        
+    }
 }
 
 try {
-    if ($action == "plus") {
-        include 'files/ClassOne.php';
-        $classOne = new ClassOne($file);
-    } elseif ($action == "minus") {
-        include 'files/ClassTwo.php';
-        $classTwo = new ClassTwo($file, "minus");
-        $classTwo->start();
-    } elseif ($action == "multiply") {
-        include 'files/Classthree.php';
-        $classThree = new Classthree();
-        $classThree->setFile($file);
-        $classThree->execute();
-    } elseif ($action == "division") {
-        include 'files/classFour.php';
-        $classFouyr = new classFour($file);
-    } else {
+    switch ($action) {
+        case 'plus':
+         case "minus" :
+         case "multiply" :  
+         case "division" :   
+            $classOne = new MathOperations($action);
+            $classOne->operation($file);
+         break;   
+        default:
         throw new \Exception("Wrong action is selected");
+            break;
     }
-} catch (\Exception $exception) {}
+    
+} catch (\Exception $exception) {
+    echo $exception->getMessage();
+}
